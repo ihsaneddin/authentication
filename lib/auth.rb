@@ -1,10 +1,10 @@
 require 'auth/devise'
 require 'doorkeeper'
+require 'jwt'
 
 require 'auth/doorkeeper/jwt'
 require 'auth/doorkeeper/jwt/config'
 require 'auth/doorkeeper/request/otp'
-require 'jwt'
 require "auth/version"
 require "auth/engine"
 
