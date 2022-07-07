@@ -8,7 +8,7 @@ module Auth
       def copy_migration
         migration_template "migration.rb", "db/migrate/create_auth_module_devise_table.rb", migration_version: migration_version
         if ::Auth.doorkeeper_enabled
-          migration_template "doorkeeper_migration.rb", "db/migrate/create_auth_module_doorkeeper_tables.rb", migration_version: migration_version
+          Rails::Generators.invoke "auth:install_doorkeeper"
         end
       end
 
