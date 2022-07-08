@@ -29,6 +29,9 @@ module Auth
   mattr_accessor :doorkeeper
   @@doorkeeper = ::Doorkeeper
 
+  mattr_accessor :doorkeeper_route_name
+  @@doorkeeper_route_name = :doorkeeper
+
   mattr_accessor :jwt
   @@jwt = Auth::Doorkeeper::JWT
 

@@ -1,6 +1,6 @@
 Auth::Engine.routes.draw do
   if Auth.doorkeeper_enabled
-    namespace :doorkeeper do
+    namespace Auth.doorkeeper_route_name do
       resources :sessions, only: [:create, :destroy], param: :token, controller: "sessions"
       resource :sessions, only: [:destroy], controller: "sessions"
     end
