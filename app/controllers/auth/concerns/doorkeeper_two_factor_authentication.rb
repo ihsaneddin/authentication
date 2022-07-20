@@ -61,7 +61,7 @@ module Auth
       end
 
       def otp_two_factor_enabled?
-        find_account&.otp_required_for_login
+        find_account&.try :otp_required_for_login
       end
 
     end

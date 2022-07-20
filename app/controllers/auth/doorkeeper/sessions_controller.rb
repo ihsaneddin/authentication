@@ -11,24 +11,24 @@ module Auth::Doorkeeper
 
     before_action only: :create do
       if(params[:grant_type].nil? && !["password", "refresh_token"].include?(params[:grant_type]))
-        render json:  { message: "Grant type #{params[:grant_type]} is not supported" }, status: :forbidden
+        response_error(I18n.t("doorkeeper.errors.messages.unsupported_grant_type"), :forbidden)
       end
     end
 
     def create
       authenticate!
     rescue ::Doorkeeper::Errors::DoorkeeperError => e
-      response_error("Invalid credentials", :forbidden)
+      response_error(I18n.t("doorkeeper.errors.messages.invalid_credentials"), :forbidden)
     end
 
     def destroy
       if token.blank?
-        response_error "Token not found" ,:not_found
+        response_error t("doorkeeper.errors.messages.invalid_token.unknown") ,:not_found
       elsif authorized?
         revoke_token
         response_success :ok, 200
       else
-        response_error "You are not authorized to revoke this token" ,:forbidden
+        response_error t("doorkeeper.errors.messages.revoke.unauthorized") ,:forbidden
       end
     end
 
@@ -53,7 +53,7 @@ module Auth::Doorkeeper
       end
 
       def response_error message="Error ocurred", status=501
-        render json: { error: message }, status: status
+        render json: { message: message }, status: status
       end
 
       def response_success data, status=:ok
