@@ -23,12 +23,12 @@ module Auth::Doorkeeper
 
     def destroy
       if token.blank?
-        response_error t("doorkeeper.errors.messages.invalid_token.unknown") ,:not_found
+        response_error I18n.t("doorkeeper.errors.messages.invalid_token.unknown") ,:not_found
       elsif authorized?
         revoke_token
         response_success :ok, 200
       else
-        response_error t("doorkeeper.errors.messages.revoke.unauthorized") ,:forbidden
+        response_error I18n.t("doorkeeper.errors.messages.revoke.unauthorized") ,:forbidden
       end
     end
 
