@@ -14,5 +14,4 @@ gem 'byebug', group: [:development, :test]
 gem "devise"
 gem "doorkeeper", "~> 5.3"
 gem 'jwt'
-gem 'attr_encrypted', '>= 1.3', '< 4', '!= 2'
 gem 'rotp',           '~> 6.0'

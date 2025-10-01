@@ -15,6 +15,7 @@ class ResourceOwnerCredential
     key = keys.find { |ak| !request.params[ak].blank? }
     account = Auth::Account.find_for_database_authentication(:login => request.params[key])
     if account && account.valid_for_authentication? { account.valid_password?(request.params[:password]) }
+      # account.notify_current_otp_code if account.otp_required_for_login
       return account
     end
   end

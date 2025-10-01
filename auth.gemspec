@@ -21,10 +21,9 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  spec.add_dependency "rails", "~> 6.1.3"
+  spec.add_dependency "rails", "~> 7.0.0"
   spec.add_dependency "devise"
   spec.add_dependency "doorkeeper", "~> 5.3"
   spec.add_dependency 'jwt'
-  spec.add_dependency 'attr_encrypted', '>= 1.3', '< 4', '!= 2'
   spec.add_dependency 'rotp',           '~> 6.0'
 end

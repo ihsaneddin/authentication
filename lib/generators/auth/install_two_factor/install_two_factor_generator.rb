@@ -7,6 +7,9 @@ module Auth
 
       def copy_migration
         migration_template "migration.rb", "db/migrate/add_auth_module_two_factor_columns.rb", migration_version: migration_version
+        puts "#####Message########"
+        puts "Run rails db:encryption:init if you have not ran it and copy the keys to your credentials file"
+        puts "####################"
       end
 
       def migration_version

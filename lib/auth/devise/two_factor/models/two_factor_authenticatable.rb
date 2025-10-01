@@ -10,24 +10,14 @@ require 'rotp'
 
           included do
             unless %i[otp_secret otp_secret=].all? { |attr| method_defined?(attr) }
-              require 'attr_encrypted'
-
-              unless singleton_class.ancestors.include?(AttrEncrypted)
-                extend AttrEncrypted
-              end
-
-              unless attr_encrypted?(:otp_secret)
-                attr_encrypted :otp_secret,
-                  :key  => self.otp_secret_encryption_key,
-                  :mode => :per_attribute_iv_and_salt unless self.attr_encrypted?(:otp_secret)
-              end
+              encrypts :otp_secret
             end
 
             attr_accessor :otp_attempt
           end
 
           def self.required_fields(klass)
-            [:encrypted_otp_secret, :encrypted_otp_secret_iv, :encrypted_otp_secret_salt, :consumed_timestep]
+            [:otp_secret, :consumed_timestep]
           end
 
           def validate_and_consume_otp!(code, options = {})

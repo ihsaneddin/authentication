@@ -2,9 +2,7 @@
 class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version %>
   def change
 
-    add_column :auth_accounts, :encrypted_otp_secret, :string
-    add_column :auth_accounts, :encrypted_otp_secret_iv, :string
-    add_column :auth_accounts, :encrypted_otp_secret_salt, :string
+    add_column :auth_accounts, :otp_secret, :string
     add_column :auth_accounts, :otp_session_id, :string
     add_column :auth_accounts, :otp_consumed_timestep, :integer
     add_column :auth_accounts, :otp_backup_codes, :text, array: true

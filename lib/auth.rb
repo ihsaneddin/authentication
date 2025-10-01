@@ -5,6 +5,7 @@ require 'jwt'
 require 'auth/doorkeeper/jwt'
 require 'auth/doorkeeper/jwt/config'
 require 'auth/doorkeeper/request/otp'
+require 'auth/doorkeeper/response/httponly_token'
 require "auth/version"
 require "auth/engine"
 
@@ -35,6 +36,16 @@ module Auth
   mattr_accessor :jwt
   @@jwt = Auth::Doorkeeper::JWT
 
+  mattr_accessor :httponly_token
+  @@httponly_token = false
+
+  mattr_accessor :cookie_args
+  @@cookie_args = [
+    "Path=/",
+    'HttpOnly',
+    'SameSite=strict'
+  ]
+
   def self.devise_setup
     yield(@@devise)
   end
@@ -55,6 +66,20 @@ module Auth
       enable_jwt
       yield(@@jwt)
     end
+  end
+
+  def self.enable_http_only_token &block
+    self.httponly_token = true
+    Rails.application.config.to_prepare do 
+      ::Doorkeeper::OAuth::TokenResponse.send :prepend, Auth::Doorkeeper::Response::HttponlyToken
+    end
+    if block_given?
+      self.cookie_args = yield(self.cookie_args)
+    end
+    callback = lambda {|request|  
+      request.cookies['access_token']
+    }
+    @@doorkeeper.config.instance_variable_set(:@access_token_methods, callback)
   end
 
   def self.setup
