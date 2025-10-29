@@ -1,6 +1,18 @@
+require 'logger'
 require_relative "boot"
 
-require "rails/all"
+require "rails"
+# Pick the frameworks you want:
+require "active_model/railtie"
+require "active_job/railtie"
+require "active_record/railtie"
+#require "active_storage/engine"
+require "action_controller/railtie"
+require "action_mailer/railtie"
+#require "action_mailbox/engine"
+# require "action_text/engine"
+require "action_view/railtie"
+require "action_cable/engine"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -11,6 +23,9 @@ module Dummy
   class Application < Rails::Application
     config.load_defaults Rails::VERSION::STRING.to_f
 
+    # For compatibility with applications that use this config
+    config.action_controller.include_all_helpers = false
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
@@ -18,5 +33,7 @@ module Dummy
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    #
+    config.eager_load_paths << Rails.root.join("lib")
   end
 end

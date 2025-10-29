@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount Auth::Engine => "/auth"
+  use_doorkeeper_token_authenticatable_routes
 end

@@ -4,14 +4,18 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Specify your gem's dependencies in auth.gemspec.
 gemspec
 
-group :development do
-  gem 'sqlite3'
-end
+# group :development do
+#   gem 'sqlite3'
+# end
 
 # To use a debugger
-gem 'byebug', group: [:development, :test]
+#
 
-gem "devise"
-gem "doorkeeper", "~> 5.3"
-gem 'jwt'
-gem 'rotp',           '~> 6.0'
+group :development do
+  gem "puma"
+  gem 'byebug'
+  gem 'devise'
+  gem "pg"
+end
+gem "sprockets-rails"
+gem 'plugins', path: "../plugins"
