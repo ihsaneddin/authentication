@@ -17,7 +17,7 @@ module Auth
 
           def doorkeeper_authenticate!
             before do
-              doorkeeper_authenticate!
+              doorkeeper_authenticate! unless skip_doorkeeper_authentication
             end
           end
 
@@ -29,8 +29,17 @@ module Auth
 
         module HelperMethods
 
-          def doorkeeper_authenticate!
-            doorkeeper_authorize! unless route.settings[:skip_doorkeeper_authentication]
+          def doorkeeper_authenticate!(*scopes)
+            raise ::Auth::Errors::Unauthenticated("Unauthenticated!") unless doorkeeper_authenticate(*scopes)
+          end
+
+          def doorkeeper_authenticate(*scopes)
+            @_doorkeeper_scopes ||= scopes
+            doorkeeper_token&.acceptable?(@_doorkeeper_scopes)
+          end
+
+          def skip_doorkeeper_authentication
+            route.settings[:skip_doorkeeper_authentication]
           end
 
           def doorkeeper_current_resource_owner

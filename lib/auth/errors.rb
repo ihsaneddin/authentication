@@ -1,6 +1,9 @@
 module Auth
   module Errors
 
+    class Unauthenticated  < StandardError
+    end
+
     module TwoFactorAuthentication
 
       class SessionMaxAttemptsReached < StandardError

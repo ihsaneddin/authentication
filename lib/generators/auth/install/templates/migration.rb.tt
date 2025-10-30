@@ -131,6 +131,9 @@ class CreateAuthTables < ActiveRecord::Migration<%=migration_version%>
       column: :application_id
     )
 
+    remove_index :oauth_access_tokens, :token
+    add_index :oauth_access_tokens, "md5(token)", unique: true, name: "index_oauth_access_tokens_on_hashed_token"
+
     #
     # === oauth_access_tokens
     #
@@ -150,6 +153,7 @@ class CreateAuthTables < ActiveRecord::Migration<%=migration_version%>
       t.text :token, null: false
       #t.string :token, null: false
 
+      #t.text   :refresh_token
       t.string   :refresh_token
       t.integer  :expires_in
       t.string   :scopes
@@ -172,7 +176,8 @@ class CreateAuthTables < ActiveRecord::Migration<%=migration_version%>
       t.string   :previous_refresh_token, null: false, default: ""
     end
 
-    add_index :oauth_access_tokens, :token, unique: true
+    #add_index :oauth_access_tokens, :token, unique: true
+    add_index :oauth_access_tokens, "md5(token)", unique: true
     add_index :oauth_access_tokens,
               [:resource_owner_id, :resource_owner_type],
               name: 'polymorphic_owner_oauth_access_tokens'
@@ -184,7 +189,8 @@ class CreateAuthTables < ActiveRecord::Migration<%=migration_version%>
         WHERE refresh_token IS NOT NULL
       SQL
     else
-      add_index :oauth_access_tokens, :refresh_token, unique: true
+      #add_index :oauth_access_tokens, :refresh_token, unique: true
+      add_index :oauth_access_tokens, "md5(refresh_token)", unique: true
     end
 
     add_foreign_key(

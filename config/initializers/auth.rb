@@ -469,20 +469,20 @@ Auth.config.setup do |auth|
     #
     # realm "Doorkeeper"
   end
-  auth.doorkeeper.extensions.setup do |extension|
-    extension.jwt.setup do
-      token_payload do |opts|
-        resource_owner = opts[:resource_owner]
-        {
-          iss: "Auth",
-          iat: Time.current.utc.to_i,
-          jti: SecureRandom.uuid,
-          user: resource_owner.as_json
-        }
-      end
-      use_application_secret false
-      secret_key Rails.application.secret_key_base
-      encryption_method :hs512
-    end
-  end
+  # auth.doorkeeper.extensions.setup do |extension|
+  #   extension.jwt.setup do
+  #     token_payload do |opts|
+  #       resource_owner = opts[:resource_owner]
+  #       {
+  #         iss: "Auth",
+  #         iat: Time.current.utc.to_i,
+  #         jti: SecureRandom.uuid,
+  #         user: resource_owner.as_json
+  #       }
+  #     end
+  #     use_application_secret false
+  #     secret_key Rails.application.secret_key_base
+  #     encryption_method :hs512
+  #   end
+  # end
 end

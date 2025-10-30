@@ -6,7 +6,7 @@ module Auth
     end
 
     module Helpers
-      def use_doorkeeper_token_authenticatable_routes(base_scope: "auth", path: "sessions", controller: "auth/doorkeeper/sessions")
+      def use_doorkeeper_token_authenticatable_routes(base_scope: "auth", path: "sessions", controller: "/auth/doorkeeper/sessions")
         each_enabled_authenticatable do |klass, route_segment|
           use_doorkeeper_token_authenticatable_route(
             klass,
@@ -18,7 +18,7 @@ module Auth
         end
       end
 
-      def use_doorkeeper_token_authenticatable_route(klass, segment: nil, base_scope: "auth", path: 'sessions', controller: "auth/doorkeeper/sessions")
+      def use_doorkeeper_token_authenticatable_route(klass, segment: nil, base_scope: "auth", path: 'sessions', controller: "/auth/doorkeeper/sessions")
         raise ArgumentError, "klass must respond to .auth_config" unless klass.respond_to?(:auth_config)
         cfg = klass.auth_config
         return unless cfg.doorkeeper.enabled
