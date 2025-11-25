@@ -8,7 +8,7 @@ module Auth
         included do
 
           before_action only: :create do
-            unless ["password", "refresh_token"].include?(params[:grant_type])
+            unless authenticatable_class.auth_doorkeeper.grant_types.include?(params[:grant_type])
               response_error(I18n.t("doorkeeper.errors.messages.unsupported_grant_type"), :forbidden)
             end
           end
@@ -46,7 +46,7 @@ module Auth
         def authenticatable_class
           name = @authenticatable_class || params[:authenticatable].presence || params[:authenticatable_class].presence
           return unless name
-          @authenticatable_class = ::Auth::Models::Decorators::Authenticatable.registered_classes.find{|klass| klass.name == name }
+          @authenticatable_class ||= ::Auth::Models::Decorators::Authenticatable.registered_classes.find{|klass| klass.name == name }
           unless @authenticatable_class
             response_error(I18n.t("doorkeeper.errors.messages.invalid_credentials"), :forbidden)
           end

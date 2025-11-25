@@ -7,8 +7,8 @@ module Auth
       mattr_accessor :registered_classes
       @@registered_classes = Set.new
 
-      def self.register(klass)
-        @@registered_classes << klass
+      def self.register(*klasses)
+        klasses.each {|klass| @@registered_classes << klass }
       end
 
       def self.included base
@@ -44,11 +44,11 @@ module Auth
           'config',
           {},
           default_options,
-          method_prefix: "config",
-          &block
+          method_prefix: "config"
         )
 
         base.include InstanceMethods
+        base.extend ClassMethods
 
         base.before_initiation :before_initiation
         base.after_initiation :after_initiation
@@ -71,7 +71,7 @@ module Auth
             callbacks: config_builder(**{
               before_validation: nil,
               validate: nil,
-              afeter_validation: nil,
+              after_validation: nil,
               before_create: nil,
               before_save: nil,
               after_create: nil,
@@ -80,6 +80,7 @@ module Auth
           }),
           session: config_builder(**{
             expires_in: 5.minutes,
+            cooldown_in: 1.minute,
             uid: proc {
               "#{SecureRandom.hex(8)}"
             },
@@ -90,6 +91,15 @@ module Auth
                 expires_at: Time.now + config_session.expires_in
               })
             },
+            callbacks: config_builder(**{
+              before_validation: nil,
+              validate: nil,
+              after_validation: nil,
+              before_create: nil,
+              before_save: nil,
+              after_create: nil,
+              after_save: nil
+            })
           }),
         }
         defaults
@@ -102,6 +112,10 @@ module Auth
         end
 
         def add_configuration key, default_value=nil
+          config.add(key.to_sym, default_value)
+        end
+
+        def add_config key, default_value=nil
           config.add(key.to_sym, default_value)
         end
 
@@ -123,7 +137,7 @@ module Auth
           perform_before_initiation(*args)
           session = perform_initiation(*args)
           if session.persisted?
-            after_initiation(session, *args)
+            perform_after_initiation(session, *args)
           end
           session
         end
@@ -131,17 +145,18 @@ module Auth
         def verify_two_factor_authentication(session, authentication, *args)
           session.current_authentication = authentication
           perform_before_verification(session, authentication, *args)
+          perform_verification(session, authentication, *args)
         end
 
         protected
 
         def before_initiation(*args)
           payload = {authenticatable: authenticatable, object: self}
-          publish_event('before_initiation', bus: :two_factor_authentication, **payload)
+          publish_event('before_initiation', **payload)
         end
 
         def perform_before_initiation(*args)
-          self.class.methods_annotated_with(:before_initiation, true).each{|mname| smart_send(*args) }
+          self.class.methods_annotated_with(:before_initiation, true).each{|mname| smart_send(mname, args) }
         end
 
         def perform_initiation(*args)
@@ -151,54 +166,53 @@ module Auth
 
           session = config_session.create
           mname = initiation_methods[0]
-          session.current_authentication = smart_send(mname, *args) if mname
+          session.current_authentication = smart_send(mname, args) if mname
           session
         end
 
         def perform_after_initiation(session, *args)
           arguments = args.unshift(session)
-          self.class.methods_annotated_with(:after_initiation, true).each{|mname| smart_send(*arguments) }
+          self.class.methods_annotated_with(:after_initiation, true).each{|mname| smart_send(mname, arguments) }
         end
 
         def after_initiation(session, *args)
-          payload = opts.merge(authenticatable: authenticatable, object: self, session: session, current_authentication: session.current_authentication)
-          publish_event('after_initiation', bus: :two_factor_authentication, **payload)
+          payload = args.extract_options!.merge(authenticatable: authenticatable, object: self, session: session, current_authentication: session.current_authentication)
+          publish_event('after_initiation', **payload)
         end
 
         def before_verification(session, authentication, *args)
-          payload = opts.merge(authenticatable: authenticatable, object: self)
-          publish_event('before_verification', bus: :two_factor_authentication, **payload)
+          payload = args.extract_options!.merge(authenticatable: authenticatable, object: self)
+          publish_event('before_verification', **payload)
         end
 
         def perform_before_verification(session, authentication, *args)
-          arguments = args.unshift(session)
           arguments = args.unshift(authentication)
-          self.class.methods_annotated_with(:before_verification, true).each{|mname| smart_send(*arguments) }
+          arguments = args.unshift(session)
+          self.class.methods_annotated_with(:before_verification, true).each{|mname| smart_send(mname, arguments) }
         end
 
         def perform_verification(session, authentication,  *args)
           perform_before_verification(session, authentication, *args)
           verification_methods = self.class.methods_annotated_with(:verification, true)
-          authenticated = session.attempt!(config.session.max_attempts) do
-            arguments = args.unshift(session)
+          authenticated = session.attempt!(max_attempts: config.session.max_attempts) do
             arguments = args.unshift(authentication)
-            verification_methods.map{|mname| smart_send(mname, *arguments) }.reduce{|result, step| config.verification_logical_operator == "and" ? result && step : result || step }
+            arguments = args.unshift(session)
+            verification_methods.map{|mname| smart_send(mname, arguments) }.reduce{|result, step| config.verification_logical_operator == "and" ? result && step : result || step }
           end
           if authenticated
-            peform_after_verification(session, authentication, *args)
+            perform_after_verification(session, *args)
           end
           authenticated
         end
 
-        def perform_after_verification session, **opts
+        def perform_after_verification session, *args
           arguments = args.unshift(session)
-          arguments = args.unshift(authentication)
-          self.class.methods_annotated_with(:after_verification, true).each{|mname| smart_send(*arguments) }
+          self.class.methods_annotated_with(:after_verification, true).each{|mname| smart_send(mname, arguments) }
         end
 
-        def after_verification(session, **opts)
-          payload = opts.merge(authenticatable: authenticatable, object: self)
-          publish_event('after_verification', bus: :two_factor_authentication, **payload)
+        def after_verification(session, *args)
+          payload = args.extract_options!.merge(authenticatable: authenticatable, object: self)
+          publish_event('after_verification', **payload)
         end
       end
 

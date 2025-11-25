@@ -15,13 +15,13 @@ module Auth
 
         module ClassMethods
 
-          def doorkeeper_authenticate!
+          def doorkeeper_authenticate!(*scopes)
             before do
-              doorkeeper_authenticate! unless skip_doorkeeper_authentication
+              doorkeeper_authenticate!(*scopes) unless skip_doorkeeper_authentication
             end
           end
 
-          def skip_authentication!
+          def skip_doorkeeper_authentication!
             route_setting :skip_doorkeeper_authentication, true
           end
 

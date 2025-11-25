@@ -12,7 +12,7 @@ module Auth
   autoload :Errors, "auth/errors"
   autoload :Doorkeeper, "auth/doorkeeper"
   autoload :Grape, "auth/grape"
-  autoload :Providers, "auth/grape"
+  autoload :Providers, "auth/providers"
 
   mattr_accessor :configuration
   @@configuration = Configuration

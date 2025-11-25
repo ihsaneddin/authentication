@@ -23,5 +23,10 @@ module Auth
       application_record_base.constantize
     end
 
+    def self.register_two_factor_authentication_providers *args
+      args = args.map(&:constantize)
+      ::Auth::Providers::TwoFactorAuthentication.register(*args)
+    end
+
   end
 end

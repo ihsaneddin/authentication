@@ -91,6 +91,7 @@ class CreateAuthTables < ActiveRecord::Migration<%=migration_version%>
     # === oauth_applications
     #
      create_table :oauth_applications do |t|
+      t.references :owner, polymorphic: true, index: false
       t.string  :name,    null: false
       t.string  :uid,     null: false
       # Remove `null: false` or use conditional constraint if you are planning to use public clients.
@@ -106,6 +107,7 @@ class CreateAuthTables < ActiveRecord::Migration<%=migration_version%>
     end
 
     add_index :oauth_applications, :uid, unique: true
+    add_index :oauth_applications, [:owner_id, :owner_type], name: "polymorphic_owner_oauth_applications
 
     #
     # === oauth_access_grants

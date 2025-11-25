@@ -3,6 +3,8 @@ module Auth
 
     include ::Doorkeeper::Orm::ActiveRecord::Mixins::AccessToken
 
+    belongs_to :resource_owner, polymorphic: true, optional: true
+
     self.table_name= "oauth_access_tokens"
 
   end

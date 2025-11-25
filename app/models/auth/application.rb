@@ -5,5 +5,7 @@ module Auth
 
     self.table_name= "oauth_applications"
 
+    belongs_to :owner, polymorphic: true, optional: true
+
   end
 end

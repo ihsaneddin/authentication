@@ -7,6 +7,8 @@ module Auth
           extend ActiveSupport::Concern
 
           included do
+            include Plugins::Models::Concerns::IdempotencyLockable
+
             belongs_to :authenticatable, polymorphic: true
 
             encrypts :secret
@@ -36,7 +38,7 @@ module Auth
           end
 
           def provider_class
-            ::Auth::Providers::TwoFactorAuthentication.registered_classes.select{|klass| klass.config.name == name }
+            ::Auth::Providers::TwoFactorAuthentication.registered_classes.select{|klass| klass.config.name == name }[0]
           end
 
           def provider

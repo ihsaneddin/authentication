@@ -45,9 +45,9 @@ Auth.config.setup do |auth|
     # access_token_class "Doorkeeper::AccessToken"
     # access_grant_class "Doorkeeper::AccessGrant"
     # application_class "Doorkeeper::Application"
-    # access_token_class "Auth::AccessToken"
-    # access_grant_class "Auth::AccessGrant"
-    # application_class "Auth::Application"
+    access_token_class "Auth::AccessToken"
+    access_grant_class "Auth::AccessGrant"
+    application_class "Auth::Application"
     #
     # Don't forget to include Doorkeeper ORM mixins into your custom models:
     #
@@ -101,9 +101,13 @@ Auth.config.setup do |auth|
     # `grant_type` - the grant type of the request (see Doorkeeper::OAuth)
     # `scopes` - the requested scopes (see Doorkeeper::OAuth::Scopes)
     #
-    # custom_access_token_expires_in do |context|
-    #   context.client.application.additional_settings.implicit_oauth_expiration
-    # end
+    custom_access_token_expires_in do |context|
+      resource_owner = context.resource_owner
+      resource_owner ||= context.client.owner
+      if resource_owner
+        resource_owner.auth_config.doorkeeper.access_token_expires_in
+      end
+    end
 
     # Use a custom class for generating the access token.
     # See https://doorkeeper.gitbook.io/guides/configuration/other-configurations#custom-access-token-generator
@@ -222,8 +226,8 @@ Auth.config.setup do |auth|
     # For more information go to
     # https://doorkeeper.gitbook.io/guides/ruby-on-rails/scopes
     #
-    # default_scopes  :public
-    # optional_scopes :write, :update
+    default_scopes  :user
+    optional_scopes :app, :admin #:write, :update
 
     # Allows to restrict only certain scopes for grant_type.
     # By default, all the scopes will be available for all the grant types.
@@ -340,7 +344,7 @@ Auth.config.setup do |auth|
     #   http://tools.ietf.org/html/rfc6819#section-4.4.3
     #
     #grant_flows %w[authorization_code client_credentials]
-    grant_flows %w[password]
+    grant_flows %w[password client_credentials]
 
     # Allows to customize OAuth grant flows that +each+ application support.
     # You can configure a custom block (or use a class respond to `#call`) that must

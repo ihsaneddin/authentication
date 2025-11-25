@@ -25,6 +25,10 @@ module Auth
             name: nil,
             native_provider: nil,
             doorkeeper: config_builder(**{
+              grant_types: ["password", "refresh_token"],
+              default_grant_type: proc { auth_config.doorkeeper.grant_types[0] },
+              allowed_scopes: proc { (::Auth.config.doorkeeper.config.default_scopes.to_a + ::Auth.config.doorkeeper.config.optional_scopes.to_a).join(" ") },
+              default_scope: proc { ::Auth.config.doorkeeper.config.default_scopes },
               enabled: false,
               resource_owner_authenticator: proc { nil },
               resource_owner_from_credentials: proc {|request| nil },
@@ -167,11 +171,18 @@ module Auth
               class_name: 'Auth::AccessToken',
               as: :resource_owner,
               dependent: :destroy
+
+            has_many :auth_applications,
+              class_name: 'Auth::Application',
+              as: :owner,
+              dependent: :destroy
           end
 
-          def generate_auth_access_token(scopes='')
+          def generate_auth_access_token(app=nil, scopes=auth_doorkeeper.default_scope)
             ::Auth::AccessToken.create(
+              application: app,
               resource_owner_id: self.id,
+              resource_owner_type: self.class.name,
               refresh_token: generate_refresh_token,
               expires_in: auth_doorkeeper.access_token_expires_in.to_i,
               scopes: scopes

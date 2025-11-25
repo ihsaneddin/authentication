@@ -24,18 +24,19 @@ module Auth
         return unless cfg.doorkeeper.enabled
         route_segment = segment
 
-        defaults = {authenticatable: klass.name}
-
+        defaults = {authenticatable: klass.name, scope: klass.auth_doorkeeper.default_scope}
         scope base_scope do
-          scope route_segment, defaults: defaults.merge({grant_type: "password" }) do
-            post [path, ""].compact.join("/"),  to: "#{controller}#create",  as: :"#{route_segment}_token"
+          scope route_segment, defaults: defaults.merge({grant_type: klass.auth_doorkeeper.default_grant_type }) do
+            post [path, ""].compact.join("/"),  to: "#{controller}#create",  as: :"#{route_segment}#{klass.auth_name}_token"
           end
-          scope route_segment, defaults: defaults.merge({grant_type: "refresh_token" }) do
-            post [path, "refresh"].compact.join("/"),  to: "#{controller}#create",  as: :"#{route_segment}_refresh_token"
+          if klass.auth_doorkeeper.grant_types.include?("refresh_token")
+            scope route_segment, defaults: defaults.merge({grant_type: "refresh_token" }) do
+              post [path, "refresh"].compact.join("/"),  to: "#{controller}#create",  as: :"#{route_segment}#{klass.auth_name}_refresh_token"
+            end
           end
           scope route_segment, defaults: defaults do
-            post [path, "revoke"].compact.join("/"), to: "#{controller}#revoke", as: :"#{route_segment}_revoke"
-            post [path, "introspect"].compact.join("/"), to: "#{controller}#introspect", as: :"#{route_segment}_introspect"
+            post [path, "revoke"].compact.join("/"), to: "#{controller}#revoke", as: :"#{route_segment}#{klass.auth_name}_revoke"
+            post [path, "introspect"].compact.join("/"), to: "#{controller}#introspect", as: :"#{route_segment}#{klass.auth_name}_introspect"
           end
         end
       end
