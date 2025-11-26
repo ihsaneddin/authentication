@@ -30,7 +30,9 @@ module Auth
         module HelperMethods
 
           def doorkeeper_authenticate!(*scopes)
-            raise ::Auth::Errors::Unauthenticated("Unauthenticated!") unless doorkeeper_authenticate(*scopes)
+            unless doorkeeper_authenticate(*scopes)
+              raise ::Auth::Errors::Unauthenticated, "Unauthenticated!"
+            end
           end
 
           def doorkeeper_authenticate(*scopes)
@@ -43,7 +45,7 @@ module Auth
           end
 
           def doorkeeper_current_resource_owner
-            @doorkeeper_current_resource_owner ||= doorkeeper_token.resource_owner
+            @doorkeeper_current_resource_owner ||= doorkeeper_token&.resource_owner
           end
 
         end

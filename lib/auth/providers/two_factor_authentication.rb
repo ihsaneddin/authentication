@@ -166,7 +166,8 @@ module Auth
 
           session = config_session.create
           mname = initiation_methods[0]
-          session.current_authentication = smart_send(mname, args) if mname
+          arguments = args.unshift(session)
+          session.current_authentication = smart_send(mname, arguments) if mname
           session
         end
 

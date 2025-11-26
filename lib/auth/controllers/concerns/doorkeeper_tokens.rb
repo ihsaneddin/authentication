@@ -7,6 +7,10 @@ module Auth
 
         included do
 
+          rescue_from ::Auth::Errors::Unauthenticated  do |e|
+            response_error( e.message || I18n.t("doorkeeper.errors.messages.invalid_credentials"), :forbidden)
+          end
+
           before_action only: :create do
             unless authenticatable_class.auth_doorkeeper.grant_types.include?(params[:grant_type])
               response_error(I18n.t("doorkeeper.errors.messages.unsupported_grant_type"), :forbidden)
