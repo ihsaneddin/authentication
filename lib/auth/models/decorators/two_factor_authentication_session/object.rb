@@ -15,6 +15,7 @@ module Auth
             attribute :error_code,        :string
             attribute :error_message,     :string
             attribute :channel,           :string
+            attribute :context,           :string
 
           end
 
