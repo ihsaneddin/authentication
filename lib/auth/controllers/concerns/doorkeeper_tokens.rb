@@ -43,7 +43,7 @@ module Auth
           if(authorize_response.status == :ok)
             response_success authorize_response.body, authorize_response.status
           else
-            raise ::Doorkeeper::Errors::DoorkeeperError
+            response_error(authorize_response.body[:error_description] || I18n.t("doorkeeper.errors.messages.invalid_credentials"), authorize_response.status)
           end
         end
 
