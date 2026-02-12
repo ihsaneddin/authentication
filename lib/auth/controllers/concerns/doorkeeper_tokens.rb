@@ -59,6 +59,15 @@ module Auth
 
         private
 
+        def server
+          @server ||= ::Doorkeeper::Server.new(self).tap do |srv|
+            application = authenticatable_class&.auth_doorkeeper&.default_application(request)
+            if application.is_a?(::Doorkeeper::Application) || application.is_a?(::Auth::Application)
+              srv.instance_variable_set(:@client, ::Doorkeeper::OAuth::Client.new(application))
+            end
+          end
+        end
+
         def resource_owner_from_credentials
           @resource_owner_from_credentials ||= authenticatable_class.auth_config.doorkeeper.resource_owner_from_credentials(request)
         end

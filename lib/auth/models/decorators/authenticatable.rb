@@ -29,6 +29,7 @@ module Auth
               default_grant_type: proc { auth_config.doorkeeper.grant_types[0] },
               allowed_scopes: proc { (::Auth.config.doorkeeper.config.default_scopes.to_a + ::Auth.config.doorkeeper.config.optional_scopes.to_a).join(" ") },
               default_scope: proc { ::Auth.config.doorkeeper.config.default_scopes },
+              default_application: nil,
               enabled: false,
               resource_owner_authenticator: proc { nil },
               resource_owner_from_credentials: proc {|request| nil },
