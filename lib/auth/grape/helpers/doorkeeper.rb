@@ -17,7 +17,9 @@ module Auth
 
           def doorkeeper_authenticate!(*scopes)
             before do
-              doorkeeper_authenticate!(*scopes) unless skip_doorkeeper_authentication
+              route_scopes = Array(route.options.dig(:doorkeeper, :scopes) || [])
+              scopes = scopes + route_scopes
+              doorkeeper_authenticate!(*scopes.uniq) unless skip_doorkeeper_authentication
             end
           end
 
