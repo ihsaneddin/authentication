@@ -41,7 +41,9 @@ module Auth
         def authenticate!
           headers.merge!(authorize_response.headers)
           if(authorize_response.status == :ok)
-            response_success authorize_response.body, authorize_response.status
+            response_data = authenticatable_class&.auth_doorkeeper&.custom_token_response(authorize_response.body)
+            response_data ||= authorize_response.body
+            response_success response_data, authorize_response.status
           else
             response_error(authorize_response.body[:error_description] || I18n.t("doorkeeper.errors.messages.invalid_credentials"), authorize_response.status)
           end

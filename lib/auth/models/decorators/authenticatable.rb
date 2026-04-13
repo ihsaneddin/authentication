@@ -30,6 +30,7 @@ module Auth
               allowed_scopes: proc { (::Auth.config.doorkeeper.config.default_scopes.to_a + ::Auth.config.doorkeeper.config.optional_scopes.to_a).join(" ") },
               default_scope: proc { ::Auth.config.doorkeeper.config.default_scopes },
               default_application: nil,
+              custom_token_response: nil,
               enabled: false,
               resource_owner_authenticator: proc { nil },
               resource_owner_from_credentials: proc {|request| nil },

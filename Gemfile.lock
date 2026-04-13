@@ -9,6 +9,7 @@ PATH
       rails (>= 7.0.1)
       ransack (~> 3.1.0)
       store_model
+      with_advisory_lock
 
 PATH
   remote: .
@@ -240,6 +241,9 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    with_advisory_lock (5.3.0)
+      activerecord (>= 6.1)
+      zeitwerk (>= 2.6)
     zeitwerk (2.7.3)
 
 PLATFORMS
